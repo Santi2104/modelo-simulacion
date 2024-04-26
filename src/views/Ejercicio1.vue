@@ -85,9 +85,9 @@ const ejecutarSimulaion = () => {
 
 <template>
     <h1>Ejercicio 1</h1>
-    <button @click="ejecutarSimulaion">Ejecutar</button>
+    <button @click="ejecutarSimulaion" class="btn btn-primary">Ejecutar</button>
     <div
-        class="table-responsive"
+        class="table-responsive mt-3"
     >
         <table
             class="table table-striped table-sm"

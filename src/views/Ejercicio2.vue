@@ -14,10 +14,10 @@ import { format,dayEnd,addMinute,addSecond,isBefore,isEqual} from "@formkit/temp
 let ahora = new Date();
 ahora.setHours(8, 0, 0, 0);
 let hora_actual = ahora;
-let deltaLlegada = 45;
-let deltaFinServicio = 40;
-let deltaDescanso = 60;
-let deltaTrabajo = 70;
+let deltaLlegada = 15;
+let deltaFinServicio = 10;
+let deltaDescanso = 30;
+let deltaTrabajo = 60;
 let prox_llegada = addSecond(hora_actual, deltaLlegada);
 let prox_fin_servicio = addSecond(hora_actual,deltaFinServicio);
 let prox_descanso = addSecond(hora_actual, deltaDescanso);
@@ -25,8 +25,11 @@ let prox_trabajo = dayEnd(hora_actual);
 let atendidos = 0;
 let ps = true;
 let psStatus = true;
-let q = 0;
-let i = 0;
+let q = 2;
+let iteraciones = ref(3);
+let cantidad_descansos = 0;
+let cantidad_regresos = 0;
+let fin_simulacion = ref(false);
 const datosTabla = ref([]);
 const estadoInicial = ref({
     hora_actual: format(hora_actual,{time:"medium"}),
@@ -42,15 +45,6 @@ const estadoInicial = ref({
 
 const proximo_evento = (llegada,fin,descanso,trabajo) => {
 
-// if(isBefore(llegada,fin) && isBefore(llegada,descanso) && isBefore(llegada,trabajo)){
-//     return 1
-// }else if(isBefore(fin,llegada) && isBefore(fin,descanso) && isEqual(fin,trabajo)){
-//     return 2
-// }else if(isBefore(descanso,llegada) && isBefore(descanso,fin) && isEqual(descanso,trabajo)){
-//     return 3
-// }else{
-//     return 4
-// }
     const tiempos = [llegada,fin,descanso,trabajo];
     const proximoEvento = new Date(Math.min(...tiempos));
     if(format(llegada,{time:"medium"}) == format(proximoEvento,{time:"medium"})){
@@ -77,7 +71,6 @@ const evento_llegada = () => {
         }else{
             ps = true
             prox_fin_servicio = addSecond(hora_actual, deltaFinServicio);
-            console.log("ACa estamos",prox_fin_servicio)
         }
     }else{
         q++
@@ -104,6 +97,7 @@ const evento_fin_servicio = () => {
 
 const evento_descanso = () => {
     hora_actual = prox_descanso;
+    cantidad_descansos++;
     psStatus = false;
     prox_trabajo = addSecond(prox_descanso, deltaDescanso);
     prox_fin_servicio = addSecond(prox_fin_servicio, deltaDescanso);
@@ -111,6 +105,7 @@ const evento_descanso = () => {
 }
 
 const evento_trabajo = () => {
+    cantidad_regresos++;
     hora_actual = prox_trabajo;
     psStatus = true;
     prox_descanso = addSecond(prox_trabajo, deltaTrabajo);
@@ -120,10 +115,10 @@ const evento_trabajo = () => {
 const simulacion = () =>{
 
     datosTabla.value.push(estadoInicial.value);
-    while(i <= 10){
+    let i = 0
+    while( i < iteraciones.value){
         let op = proximo_evento(prox_llegada,prox_fin_servicio,prox_descanso,prox_trabajo);
-        deltaDescanso = Math.floor(Math.random() * (120 - 30) ) + 30
-        console.log("La opcion es ",op)
+        deltaDescanso = Math.floor(Math.random() * (30 - 1) ) + 1
         switch (op) {
             case 1:
                 console.log("LLEGADA")
@@ -158,6 +153,7 @@ const simulacion = () =>{
         datosTabla.value.push(estadoInicial.value)
         i++;
     }
+    fin_simulacion.value = true
 }
     
 
@@ -165,31 +161,47 @@ const simulacion = () =>{
 
 </script>
 
-<template>
+<template>    
     <h1>Ejercicio 2</h1>
-    <button @click="simulacion">Ejecutar</button>
+    <div class="row">
+        <div class="col-3">
+            <div class="mb-3 mt-2">
+                <label for="" class="form-label">Cantidad de iteraciones</label>
+                <input
+                type="text"
+                class="form-control"
+                name="iteraciones"
+                id="iteraciones"
+                v-model.number="iteraciones"
+                placeholder="Cantidad de iteraciones"
+                />
+            </div>
+        </div>
+    </div>
+    <button @click="simulacion" class="btn btn-primary">Ejecutar</button>
     <div
-        class="table-responsive"
+        class="table-responsive mt-3"
     >
         <table
             class="table table-striped table-sm"
         >
             <thead>
                 <tr>
-                <th>Hora actual</th>
-                <th>Proxima llegada</th>
-                <th>Proximo fin de servicio</th>
-                <th>Proximo descanso</th>
-                <th>Proximo vuelta al trabajo</th>
-                <th>Cola</th>
-                <th>Puesto de servicio</th>
-                <th>Estado de servicio</th>
-                <th>Atendidos</th>
-
-            </tr>
+                    <th>Iteración</th>
+                    <th>Hora actual</th>
+                    <th>Proxima llegada</th>
+                    <th>Proximo fin de servicio</th>
+                    <th>Proximo descanso</th>
+                    <th>Proxima vuelta al trabajo</th>
+                    <th>Cola</th>
+                    <th>Puesto de servicio</th>
+                    <th>Estado de servicio</th>
+                    <th>Atendidos</th>
+                </tr>
             </thead>
             <tbody>
-            <tr v-for="item in datosTabla">
+            <tr v-for="(item,index) in datosTabla">
+                <td>{{index + 1}}</td>
                 <td>{{item.hora_actual}}</td>
                 <td>{{item.prox_llegada}}</td>
                 <td>{{item.prox_fin_servicio}}</td>
@@ -202,5 +214,15 @@ const simulacion = () =>{
             </tr>
         </tbody>
         </table>
+    </div>
+    <div class="row">
+        <template v-if="fin_simulacion">
+            <div>
+                Cantidad de descansos: {{ cantidad_descansos }}
+            </div>
+            <div>
+                Cantidad de regresos: {{ cantidad_regresos }}
+            </div>
+        </template>
     </div>
 </template>

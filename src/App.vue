@@ -1,18 +1,26 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
 </script>
 
 <template>
   <header>
-    <div class="wrapper">
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink :to="{name: 'ejercicio-1'}">ejercicio n° 1</RouterLink>
-        <RouterLink :to="{name: 'ejercicio-2'}">ejercicio n° 2</RouterLink>
-      </nav>
-    </div>
+    <nav class="navbar navbar-expand navbar-light bg-light">
+      <ul class="nav navbar-nav">
+        <li class="nav-item">
+          <RouterLink to="/" class="nav-link">Inicio</RouterLink>
+        </li>
+        <li class="nav-item">
+          <RouterLink :to="{name: 'ejercicio-1'}" class="nav-link" >Ejercicio n° 1</RouterLink>
+        </li>
+        <li class="nav-item">
+          <RouterLink :to="{name: 'ejercicio-2'}" class="nav-link">Ejercicio n° 2</RouterLink>
+        </li>
+      </ul>
+    </nav>
   </header>
-
-  <RouterView />
+  <div class="col-lg mx-auto p-2 py-md-2">
+  <main>
+    <RouterView />
+  </main>
+</div>
 </template>
