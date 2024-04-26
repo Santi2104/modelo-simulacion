@@ -9,7 +9,7 @@
     Tiempo de fin de servicio: 40 segundos
     */
 import {ref} from 'vue'
-import { format, parse,dayEnd,minuteStart,addHour,addMinute,addSecond,date,isAfter,isBefore,isEqual} from "@formkit/tempo"
+import { format,dayEnd,addMinute,addSecond,isBefore,isEqual} from "@formkit/tempo"
 
 let ahora = new Date();
 ahora.setHours(8, 0, 0, 0);
@@ -99,6 +99,7 @@ const ejecutarSimulaion = () => {
                 <th>Proximo Fin de Servicio</th>
                 <th>Cola</th>
                 <th>Puesto de Servicio</th>
+                <th>Atendidos</th>
 
             </tr>
             </thead>
@@ -109,6 +110,7 @@ const ejecutarSimulaion = () => {
                 <td>{{item.prox_fin_servicio}}</td>
                 <td>{{item.q}}</td>
                 <td>{{item.ps ? 'Ocupado' : 'Libre'}}</td>
+                <td>{{ item.atendidos }}</td>
             </tr>
         </tbody>
         </table>
