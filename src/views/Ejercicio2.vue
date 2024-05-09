@@ -25,7 +25,7 @@ let prox_trabajo = dayEnd(hora_actual);
 let atendidos = 0;
 let ps = true;
 let psStatus = true;
-let q = 2;
+let q = ref(3);
 let iteraciones = ref(3);
 let cantidad_descansos = 0;
 let cantidad_regresos = 0;
@@ -38,7 +38,7 @@ const estadoInicial = ref({
     prox_descanso: format(prox_descanso,{time:"medium"}),
     prox_trabajo: format(prox_trabajo,{time:"medium"}),
     atendidos: atendidos,
-    q: q,
+    q: q.value,
     ps: ps,
     ps_estatus: psStatus
 });
@@ -67,13 +67,13 @@ const evento_llegada = () => {
     prox_llegada = addSecond(hora_actual, deltaLlegada);
     if(psStatus){
         if(ps){
-            q++
+            q.value++
         }else{
             ps = true
             prox_fin_servicio = addSecond(hora_actual, deltaFinServicio);
         }
     }else{
-        q++
+        q.value++
     }
 }
 
@@ -82,8 +82,8 @@ const evento_fin_servicio = () => {
     ps = false;
     atendidos++;
     if(psStatus){
-        if(q > 0){
-            q--
+        if(q.value > 0){
+            q.value--
             ps = true
             prox_fin_servicio = addSecond(hora_actual, deltaFinServicio);
         }else{
@@ -146,7 +146,7 @@ const simulacion = () =>{
                 prox_descanso: format(prox_descanso,{time:"medium"}),
                 prox_trabajo: format(prox_trabajo,{time:"medium"}),
                 atendidos: atendidos,
-                q: q,
+                q: q.value,
                 ps: ps,
                 ps_estatus: psStatus
             }
@@ -173,6 +173,19 @@ const simulacion = () =>{
                 name="iteraciones"
                 id="iteraciones"
                 v-model.number="iteraciones"
+                placeholder="Cantidad de iteraciones"
+                />
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="mb-3 mt-2">
+                <label for="" class="form-label">Elementos en cola</label>
+                <input
+                type="text"
+                class="form-control"
+                name="iteraciones"
+                id="iteraciones"
+                v-model.number="q"
                 placeholder="Cantidad de iteraciones"
                 />
             </div>
